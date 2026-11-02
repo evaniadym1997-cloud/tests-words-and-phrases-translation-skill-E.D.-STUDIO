@@ -137,32 +137,6 @@ TRANSLATIONS = {
     'illiterate': '不识字的；文盲的',
     'go beyond time': '超越时间；历久弥新',
     'touch audiences of all ages across different lands': '打动不同地域、各个年龄层的观众',
-    # —— 杭州二中 2026 秋季 10 月适应性检测（2026-11-01 增补）——
-    "an incredible steal": "太划算了；捡了个大便宜",
-    "inaccessible to": "对……不可及；无法接近",
-    "perform poorly": "表现不佳；表现差",
-    "marks a significant breakthrough in": "标志着……的重大突破",
-    "are empowered to": "得以有能力（去守护……）",
-    "witnessed the innovative approach firsthand": "亲眼目睹了这一创新做法",
-    "embraced the challenge enthusiastically": "热情地迎接挑战",
-    "invested such extraordinary effort into what seemed like a simple project": "在一个看似简单的项目上投入了如此非凡的努力",
-    "turning abstract ocean protection theories into practical daily action": "把抽象的海洋保护理论转化为切实可行的日常行动",
-    "undervalue": "低估……的价值；不重视",
-    "uncover": "揭露；发现；查明",
-    "shelter": "庇护；掩蔽；避难处",
-    "passing on thoughts and feelings across languages": "跨语言传递思想与情感",
-    "distinguished poets": "杰出诗人",
-    "in this dawn of possibilities": "在我们共同面对的这个充满可能的黎明里",
-    "experimented with": "进行……试验；试用",
-    "what he created was anything but conventional wooden furniture that perfectly blended classic craftsmanship with contemporary design": "他做出的东西绝非循规蹈矩的木制家具，而是将经典工艺与当代设计完美融合。",
-    "true craftsmanship isn’t about blindly repeating what our ancestors did。it’s about understanding the essence of tradition while having the courage to adapt it for today’s world.": "真正的工艺不是盲目重复祖先的做法，而是理解传统的本质，并有勇气为今天的世界加以改造。",
-    "i came to understand that new-era craftsmanship represents the perfect marriage of dedication and innovation. it honors the past while embracing the future, proving that excellence comes not from doing one thing forever, but from doing it well with an ever-evolving spirit.": "我开始明白，新时代的工艺是敬业与创新的完美结合；它致敬过去、拥抱未来，证明卓越不在于永远做一件事，而在于以不断演进的精神把它做好。",
-    "start with something simple and build from there.": "从简单的事情做起，并在那基础上逐步构建。",
-    "life is too short to let ideas stagnate (停止); now’s the time to turn them to reality.": "人生苦短，不能让想法停滞；此刻正是把想法化为现实的时候。",
-    "life is too short to let ideas stagnate ; now’s the time to turn them to reality.": "人生苦短，不能让想法停滞；此刻正是把想法化为现实的时候。",
-    "traditional chinese poetry is more than literature — it is a bond connecting two distant civilizations through shared feelings and lasting charm.": "中国古典诗歌不只是文学——它是一根凭借共通的情感与持久魅力连接两大遥远文明的纽带。",
-    "when the translation reaches readers, it gains new life": "当译作抵达读者，它便获得了新的生命。",
-    "poetry is like a stream that crosses mountains and rivers and flows into the heart of a foreign land.": "诗歌如一条穿越千山万水的溪流，流入异国的心灵深处。",
 }
 
 # 去掉 MyMemory 偶尔返回的前缀词性标记（如 "v.送达" → "送达"）
@@ -334,18 +308,6 @@ def _contains_cjk(text):
     """判断字符串是否含有中日韩字符（用于区分英文词块与中文释义）。"""
     return has_chinese(text)
 
-
-def _cjk_dominant(text):
-    """判断字符串是否「中文占优」——用于区分「纯中文词块」与「英文句 + 内嵌中文括号」。
-
-    英文句中内嵌中文注释（如 "stagnate (停止); now's …"）含 CJK 但字母占绝大多数，
-    若按纯中文词块处理会把英文原文直接当作中文释义，导致翻译失败。
-    """
-    t = text or ''
-    n_cjk = sum(1 for c in t if '\u4e00' <= c <= '\u9fff')
-    n_lat = sum(1 for c in t if c.isascii() and c.isalpha())
-    return n_cjk > n_lat
-
 # ── 固定搭配标准化（Collocation Normalization）─────────────────────────────────
 # 规则（用户明确）：将粗体词块的表面时态/人称形式还原为「词组基本形式」。
 #   1) 谓语时态还原：一般过去时 / 三单 / 完成时 → 动词原形（played→play, contributes→contribute, has contributed→contribute）
@@ -356,9 +318,7 @@ _PAREN_GLOSS = re.compile(r'[（(][^）)]*[\u4e00-\u9fff][^）)]*[）)]')
 
 def strip_paren_glosses(s):
     """去掉英文词块里内嵌的中文释义括号，如 an interwoven tapestry (织锦) of → an interwoven tapestry of"""
-    t = re.sub(r'\s+', ' ', _PAREN_GLOSS.sub(' ', s)).strip()
-    # 括号替换为空格后会留下「标点前空格」（如 stagnate (停止); → stagnate ;），清理之
-    return re.sub(r'\s+([,.;:!?])', r'\1', t)
+    return re.sub(r'\s+', ' ', _PAREN_GLOSS.sub(' ', s)).strip()
 
 # 已知动词「表面形式 → 原形」映射（只还原确知为动词的词，绝不误伤名词如 stories）
 _VERB_BASE = {
@@ -602,17 +562,6 @@ _POS = {
     'orchestra': '[n.] （大型）管弦乐队',
     'creator': '[n.] 创作者，创造者',
     'influencer': '[n.] 网络红人，影响者',
-    # —— 杭州二中 2026 秋季 10 月适应性检测（2026-11-01 增补）——
-    "record-breaking": "[adj.] 破纪录的；创纪录的",
-    "approximately": "[adv.] 大约；大概；近似地",
-    "craftsmanship": "[n.] 手艺；工艺；技艺",
-    "shelter": "[n.] 避难所；庇护所 [v.] 庇护；躲避；遮蔽",
-    "uncover": "[v.] 揭露；发现；查明",
-    "productive": "[adj.] 多产的；丰饶的；富有成效的",
-    "fix": "[n.] 修理；解决办法 [v.] 修理；固定；确定",
-    "short-lived": "[adj.] 短暂的；短命的",
-    "undervalue": "[v.] 低估……的价值；不重视",
-    "innovative": "[adj.] 创新的；革新的",
 }
 
 
@@ -908,19 +857,16 @@ def _collect_translations(input_bytes):
                     cn = cn_hint
                     pos = get_pos(en) if is_single_word(en) else None
                     translation_list.append((en, cn, current_section, pos))
-                elif _contains_cjk(en) and _cjk_dominant(en):
+                elif _contains_cjk(en):
                     # 纯中文粗体词块：需给出英文
                     cn = en
                     en_trans = translate_zh_en(en)
                     translation_list.append((en_trans or en, cn, current_section, None))
                 else:
                     # 纯英文粗体词块：译中文（有道 + MyMemory 兜底）
-                    # 内嵌中文括号（如 "stagnate (停止)"）会令整句翻译失败，
-                    # 故先剥离括号，条目英文亦以剥离后的纯英文为准。
-                    en_src = strip_paren_glosses(en) if _contains_cjk(en) else en
-                    cn = translate(en_src)
-                    pos = get_pos(en_src) if is_single_word(en_src) else None
-                    translation_list.append((en_src, cn, current_section, pos))
+                    cn = translate(en)
+                    pos = get_pos(en) if is_single_word(en) else None
+                    translation_list.append((en, cn, current_section, pos))
                 i = j
             else:
                 i += 1
@@ -1170,63 +1116,7 @@ def _derive_base(name):
     return base
 
 
-# ── 【句子翻译】板块 ─────────────────────────────────────────────────────────
-# 完整句（含主语+限定动词、能独立成句的粗体内容）不进入语言点表格，
-# 统一在文档末尾以编号列表呈现：背诵版附英文原句，默写版留 2 行 1.5 倍行距空行。
-# 英文原句不做固定搭配标准化，保持原貌。
-_SENTENCE_ORDER = ['A', 'B', 'C', 'D', '七选五', '完形填空', '语法填空']
-
-
-def _build_sentence_section(doc, sentences, is_recite=True):
-    """在文档末尾追加【句子翻译】板块。
-
-    sentences: dict {篇目: [英文原句, ...]}
-    返回写入的条数（0 表示无完整句，文档不变）。
-    """
-    if not sentences:
-        return 0
-    items = []
-    for sec in _SENTENCE_ORDER:
-        for en in sentences.get(sec, []) or []:
-            items.append((sec, en))
-    for sec in sentences:
-        if sec not in _SENTENCE_ORDER:
-            for en in sentences.get(sec, []) or []:
-                items.append((sec, en))
-    if not items:
-        return 0
-
-    p = doc.add_paragraph()
-    r = p.add_run('【句子翻译】')
-    set_run_font(r, is_chinese=True)
-    r.bold = True
-    p.paragraph_format.space_before = Pt(6)
-
-    n = 0
-    for sec, en in items:
-        n += 1
-        cn = translate(en) or '【待译】'
-        p = doc.add_paragraph()
-        p.paragraph_format.line_spacing = 1.5
-        r1 = p.add_run('%d. %s' % (n, cn))
-        set_run_font(r1, is_chinese=True)
-        r2 = p.add_run('  （%s）' % sec)
-        set_run_font(r2, is_chinese=True)
-        r2.font.size = Pt(9)
-        if is_recite:
-            p2 = doc.add_paragraph()
-            p2.paragraph_format.line_spacing = 1.5
-            r3 = p2.add_run(en)
-            set_run_font(r3, is_chinese=False)
-        else:
-            for _ in range(2):
-                pe = doc.add_paragraph()
-                pe.paragraph_format.line_spacing = 1.5
-    return n
-
-
-def _build_recite_docx(sections, title='语言点背诵版', section_meta=None, sentences=None,
-                       keep_raw=None):
+def _build_recite_docx(sections, title='语言点背诵版', section_meta=None):
     """
     背诵版（答案/记忆用）：2 列 —— 左中文(+词性) | 右英文。
     结构参照用户参考文档：标题行(合并) + 每篇[篇头(合并) / 文本话题(合并) / 文本体裁(合并)] + 词块。
@@ -1242,11 +1132,6 @@ def _build_recite_docx(sections, title='语言点背诵版', section_meta=None, 
         return buf.getvalue()
 
     section_items = [(s, its) for s, its in sections.items() if its]
-    _sent_set = set()
-    for _sec, _ens in (sentences or {}).items():
-        for _e in _ens or []:
-            _sent_set.add(_e.strip().lower())
-    _keep_set = set(e.strip().lower() for e in (keep_raw or []))
 
     table = doc.add_table(rows=1, cols=2, style='Table Grid')
     _set_table_width(table, [Cm(8), Cm(8)])
@@ -1272,27 +1157,21 @@ def _build_recite_docx(sections, title='语言点背诵版', section_meta=None, 
         _add_merged_row(table, _genre, bold=False, is_chinese=True, height=20)
 
         for (en, cn, pos) in items:
-            if en.lower() in _sent_set:
-                continue  # 完整句已单独进入【句子翻译】板块，不在语言点表重复
             cn_display = cn if cn else '【待译】'
             cn_display = apply_pos(en, cn_display)
             row = table.add_row().cells
             row[0].text = cn_display
             _format_cell(row[0], bold=False, is_chinese=True)
-            row[1].text = (en if en.lower() in _keep_set
-                           else normalize_collocation(en))
+            row[1].text = normalize_collocation(en)
             _format_cell(row[1], bold=False, is_chinese=False)
             _set_row_height(table.rows[-1], 20)
-
-    _build_sentence_section(doc, sentences, is_recite=True)
 
     buf = io.BytesIO()
     doc.save(buf)
     return buf.getvalue()
 
 
-def _build_dictate_docx(sections, title='语言点默写版', section_meta=None, sentences=None,
-                        keep_raw=None):
+def _build_dictate_docx(sections, title='语言点默写版', section_meta=None):
     """
     默写版（练习用）：3 网格列 —— 左2列合并为中文(+词性)宽列，第3列为空白英文默写格。
     结构参照用户参考文档：标题行(合并) + 每篇[篇头+文本话题+文本体裁 合并为一行] + 词块(中文宽列|空白)。
@@ -1308,11 +1187,6 @@ def _build_dictate_docx(sections, title='语言点默写版', section_meta=None,
         return buf.getvalue()
 
     section_items = [(s, its) for s, its in sections.items() if its]
-    _sent_set = set()
-    for _sec, _ens in (sentences or {}).items():
-        for _e in _ens or []:
-            _sent_set.add(_e.strip().lower())
-    _keep_set = set(e.strip().lower() for e in (keep_raw or []))
 
     table = doc.add_table(rows=1, cols=3, style='Table Grid')
     _set_table_width(table, [Cm(5.3), Cm(5.3), Cm(5.0)])
@@ -1339,8 +1213,6 @@ def _build_dictate_docx(sections, title='语言点默写版', section_meta=None,
         _add_merged_row(table, hdr_text, bold=True, is_chinese=True, height=44)
 
         for (en, cn, pos) in items:
-            if en.lower() in _sent_set:
-                continue  # 完整句已单独进入【句子翻译】板块，不在语言点表重复
             cn_display = cn if cn else '【待译】'
             cn_display = apply_pos(en, cn_display)
             row = table.add_row().cells
@@ -1350,8 +1222,6 @@ def _build_dictate_docx(sections, title='语言点默写版', section_meta=None,
             row[2].text = ''
             _format_cell(row[2], bold=False, is_chinese=False)
             _set_row_height(table.rows[-1], 20)
-
-    _build_sentence_section(doc, sentences, is_recite=False)
 
     buf = io.BytesIO()
     doc.save(buf)
@@ -1365,23 +1235,18 @@ def process_docx_bytes_table(input_bytes, base=''):
     return _build_dictate_docx(sections, (base + '语言点默写版') if base else '语言点默写版', section_meta)
 
 
-def process_docx_bytes_two(input_bytes, base='', section_meta=None, sentences=None,
-                          keep_raw=None):
+def process_docx_bytes_two(input_bytes, base='', section_meta=None):
     """
     从原始文档（粗体英文）生成两个独立文档：背诵版 + 默写版。
     返回 (背诵版_bytes, 默写版_bytes)。
     section_meta: 可选覆盖，dict[{section}] = {'topic':.., 'genre':..}。
         传入时直接采用（保证话题/体裁准确）；为 None 时自动按关键词概括。
-    sentences: 可选，dict[{section}] = [英文原句, ...] —— 完整句从语言点表格
-        分离，末尾以【句子翻译】编号列表呈现；为 None 时不产生该板块（默认行为不变）。
     """
     sections = _group_translations(input_bytes)
     if section_meta is None:
         section_meta = _build_section_meta(sections, input_bytes)
-    recite = _build_recite_docx(sections, (base + '语言点背诵版') if base else '语言点背诵版',
-                                section_meta, sentences, keep_raw)
-    dictate = _build_dictate_docx(sections, (base + '语言点默写版') if base else '语言点默写版',
-                                  section_meta, sentences, keep_raw)
+    recite = _build_recite_docx(sections, (base + '语言点背诵版') if base else '语言点背诵版', section_meta)
+    dictate = _build_dictate_docx(sections, (base + '语言点默写版') if base else '语言点默写版', section_meta)
     return recite, dictate
 
 

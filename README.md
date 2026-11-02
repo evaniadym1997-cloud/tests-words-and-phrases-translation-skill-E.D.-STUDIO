@@ -69,26 +69,7 @@
 
 体裁：应用文 / 记叙文 / 说明文 / 议论文。
 
-### 4️⃣ 完整句分流 +【句子翻译】板块
-
-标准试卷的粗体里常混有完整句（实测占 10%–30%）。引擎支持把它们从词块表中分离，末尾另起 **【句子翻译】** 编号列表：
-
-```
-【句子翻译】
-1. 他做出的东西绝非循规蹈矩的木制家具，而是将经典工艺与当代设计完美融合。  （B）
-   what he created was anything but conventional wooden furniture that…
-2. 当译作抵达读者，它便获得了新的生命。  （语法填空）
-   when the translation reaches readers, it gains new life
-```
-
-- 背诵版附**英文原句**；默写版留 **2 行 1.5 倍行距空行**供学生书写
-- **全局连续编号**，按篇目顺序（A→B→C→D→七选五→完形填空→语法填空）
-- 完整句的英文**不做固定搭配标准化**，保持原貌
-- 完整句**不会同时出现在词块表里**（避免重复）
-
-配套的 `keep_raw` 参数可逐条豁免固定搭配还原——用于「还原会改变原句语法」的条目（如 `hands told stories` 不应还原成 `hands tell stories`）。
-
-### 5️⃣ 0 待译
+### 4️⃣ 0 待译
 
 纯英文源（无双语词对）通过**离线精选词典** `TRANSLATIONS` + 权威词性词典 `_POS` 确定性生成，绝不留 `【待译】`。
 
@@ -121,17 +102,7 @@ section_meta = {
     'B': {'topic': '作者回忆童年经济拮据的圣诞节', 'genre': '记叙文'},
 }
 
-# 完整句（可选）：从词块表分离，末尾生成【句子翻译】板块
-sentences = {
-    'B': ['When we arrived, the house was already dark.'],
-}
-
-# 豁免固定搭配标准化（可选）：还原会破坏原句语法者
-keep_raw = ['What struck me most was']
-
-recite, dictate = process_docx_bytes_two(
-    data, base='套卷语言点', section_meta=section_meta,
-    sentences=sentences, keep_raw=keep_raw)
+recite, dictate = process_docx_bytes_two(data, base='套卷语言点', section_meta=section_meta)
 
 open('套卷语言点背诵版.docx', 'wb').write(recite)
 open('套卷语言点默写版.docx', 'wb').write(dictate)
@@ -163,11 +134,10 @@ python references/cloze_core.py 输入.docx 输出.docx
 
 | 函数 | 作用 |
 |---|---|
-| `process_docx_bytes_two(input_bytes, base='', section_meta=None, sentences=None, keep_raw=None)` | 一键产出 `(背诵版, 默写版)` 字节流 |
+| `process_docx_bytes_two(input_bytes, base='', section_meta=None)` | 一键产出 `(背诵版, 默写版)` 字节流 |
 | `_collect_translations(input_bytes)` | 从粗体提取 `(en, cn, section, pos)` |
-| `_build_recite_docx(sections, title, section_meta, sentences, keep_raw)` | 构建背诵版 |
-| `_build_dictate_docx(sections, title, section_meta, sentences, keep_raw)` | 构建默写版 |
-| `_build_sentence_section(doc, sentences, is_recite)` | 构建【句子翻译】板块 |
+| `_build_recite_docx(sections, title, section_meta)` | 构建背诵版 |
+| `_build_dictate_docx(sections, title, section_meta)` | 构建默写版 |
 | `normalize_collocation(s)` | 固定搭配标准化（基本形式还原） |
 | `apply_pos(en, cn)` | 词性标注（方括号前置） |
 | `strip_paren_glosses(s)` | 去掉内嵌中文括号 |
@@ -190,9 +160,7 @@ python references/cloze_core.py 输入.docx 输出.docx
 - [ ] 单词类条目全部带 `[词性]`，一词多性全列出；短语不标词性
 - [ ] 默写版英文列全空白
 - [ ] 非整句粗体英文已还原为基本形式
-- [ ] 完整句已分流至【句子翻译】板块，且**未在词块表中重复出现**
 - [ ] 字体 / 字号 / 行距符合规范
-- [ ] 引擎改动后，既有材料重跑抽取结果**完全一致**（零破坏）
 
 ---
 
